@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+	</head>
+	<style>
+		body{
+			background-image: url(img/背景图.png);
+			no-repeat 0 0px;
+			background-attachment:fixed;
+			background-size:100%;
+		}
+		.div-bor{
+			position: relative;width: 200px;
+			margin-left: 750px;
+		}
+		.icon-slect{
+			position: absolute;left: 0;z-index: 5;
+			background-repeat: no-repeat;
+			background-position: 0px 0px;
+			background-size: auto;
+			top:4px;
+			left: 5px;
+		}
+		.slect{
+			padding:4px 10px 4px 40px;
+		}
+		td{padding:2px 2px 2px 2px}
+	</style>
+<body>
+	<br><br><br><br><br><br>
+    <div class="container">
+    	<div class="row" >
+    		<div class="col-xs-6 col-sm-3">
+				编号:<input id="bh" type="text" value="" /><br><br>
+				姓名:<input id="xm" type="text" value="" /><br><br>
+				职位:<input id="zw" type="text" value="" /><br><br>
+				<input id="insert" type="button" value="插入" />
+			</div>
+			<div class="col-xs-6 col-sm-3" style="color: black">
+				<span><h1>98%</h1></span>
+			</div>
+    	</div>
+    	<br>
+    	<div class="div-bor">
+    		<i class="icon-slect"><img src="img/131.png" height="25px" width="25px"></i>
+    		<input type="text" id="filterName" class="slect"/>
+    	</div>
+    	<br>
+    	<div class="row">
+    		<table width="1200px" border="1" cellspacing="0" id="tab" style="table-layout:fixed">
+		    <thead>
+		       <tr style="background-color: burlywood;" >
+		       	  <th style="text-align: center;" width="80px" height="30px">
+		       	  <span>序号</span>
+		       	  <input id="filterName" style="display: none; position: absolute; z-index: 1; "/>
+		       	  </th>
+		          <th style="text-align: center;" height="30px" width="120px">编号</th>
+		          <th style="text-align: center;" height="30px" width="120px">姓名</th>
+		          <th style="text-align: center;" height="30px" width="120px">职位</th>
+		          <th style="text-align: center;" height="30px" width="120px">操作</th>
+		       </tr> 
+		    </thead>
+		    <tbody id="tbMain"></tbody>
+	 		</table>
+    	</div>
+    </div>
+	
+ 
+ <script type="text/javascript">
+    var ck = function(){
+	  document.getElementById("filterName").style.display = "block";
+    }
+ 	
+ 	$(function () {
+	  //默认让王五选中
+//	  $("tr:contains('王五')").addClass("selectHeight")
+	  $("#filterName").keyup(function () {
+	   $("table tbody tr").stop().hide() //将tbody中的tr都隐藏
+	    .filter(":contains('"+($(this).val())+"')").show(); //，将符合条件的筛选出来
+	  });
+	 });
+ 
+ 	
+ 	insert.onclick= function(){
+	  var tbody = document.getElementById('tbMain');
+	  tbody.style.backgroundColor="white"
+	  
+	  var trow = getDataRow(); //定义一个方法,返回tr数据
+	  var getValue=getV(trow);  //保存数据到数据库
+  	  tbody.prepend(trow); //插入到表格中
+//	  updt();
+//aaa();
+
+	  }
+ 	
+   	function getV(trow){
+   		var allD={};
+   		var tdnum=trow.cells.length; //获取td数量
+   		for(var i=0;i<(tdnum-1);i++){
+   			var ch=trow.children[i];  //获取一个td
+   			var idName=ch.id;    //获取td中id的值
+   			allD[idName]=ch.innerText;  //获取td的值
+   		}
+   		//return allD
+// 		var jsonStr = JSON.stringify(allD);
+   		$.ajax({
+		 		url:"http://127.0.0.1:8080/dld/", 
+		 		type: "POST",
+		 		data:JSON.stringify(allD),
+		 		contentType:false,
+		        processData:false,
+		 		traditional : true,//如果要传数组，这行一定要加！用传统的方式来序列化数据
+		 		success:function(data){
+					console.log(data)
+         	},
+		 		error:function(){
+					alert("请先入驻实验室！");
+				}
+      		});
+   	}
+
+	 //删除操作
+	function getDataRow(){
+		var row = document.createElement('tr'); //创建行
+		var xhCell = document.createElement('td');//创建第1列，操作列
+	 	xhCell.innerHTML=document.getElementById("tab").rows.length;
+	 	xhCell.style.textAlign="center";
+	 	xhCell.height="30px";
+	 	xhCell.id='xh';
+	 	row.appendChild(xhCell); //加入行  ，下面类似
+		
+	 	var bh_value=document.getElementById('bh');
+	 	var bhCell = document.createElement('td');//创建第2列，操作列
+	 	bhCell.innerHTML=bh_value.value;
+	 	bhCell.style.textAlign="center"
+	 	bhCell.height="30px"
+	 	bhCell.id='bh';
+	 	row.appendChild(bhCell); //加入行  ，下面类似
+	 	
+	 	var xm_value=document.getElementById('xm');
+	 	var xmCell = document.createElement('td');//创建第3列，操作列
+	 	xmCell.innerHTML=xm_value.value;
+	 	xmCell.style.textAlign="center"
+	 	xmCell.height="30px"
+	 	xmCell.id='xm';
+	 	row.appendChild(xmCell); //加入行  ，下面类似
+	 	
+	 	var zw_value=document.getElementById('zw');
+	 	var zwCell = document.createElement('td');//创建第4列，操作列
+	 	zwCell.innerHTML=zw_value.value;
+	 	zwCell.height="30px"
+	 	zwCell.id='zw';
+	 	row.appendChild(zwCell); //加入行  ，下面类似
+
+		 var delCell = document.createElement('td');//创建第5列，操作列
+		 delCell.height="30px";
+		 row.appendChild(delCell);
+		 
+		 var btnUpe1 = document.createElement('input'); //创建一个input控件
+		 btnUpe1.setAttribute('type','button'); //type="button"
+		 btnUpe1.className = "btnUpe1";
+		 btnUpe1.setAttribute('value','更新'); 
+		 
+//		 var btnok = document.createElement('input'); //创建一个input控件
+//		 btnok.setAttribute('type','button'); //type="button"
+//		 btnok.className = "btnok1";
+//		 btnok.setAttribute('value','确定'); 
+		 
+		 var btnDel = document.createElement('input'); //创建一个input控件
+		 btnDel.setAttribute('type','button'); //type="button"
+		 btnDel.setAttribute('value','删除'); 
+		 
+		 //上传文件
+		 var btnupload=document.createElement('div');
+		 btnupload.id="upload";
+		 btnupload.style.display="inline"; //标签并排显示
+		 var btnupload1 = document.createElement('input'); //创建一个input控件
+		 btnupload1.setAttribute('type','file');
+		 btnupload1.multiple="multiple";
+		 btnupload1.style.display="none";
+		 btnupload1.className = "btnupload";
+		 btnupload1.id='btnupload1';
+//		 btnupload1.onchange=function(){   //上传文件---后台flask接受
+//		 var files = $("#btnupload1").get(0).files;
+//			var formData = new FormData();
+//			for(var i=0; i<files.length; i++){
+//				formData.append("file2", files[i]);
+//			}
+//			formData.append("usr", bh_value.value);
+//		    $.ajax({
+//		        url:"http://127.0.0.1:8080/",   //接受文件地址
+//		        type: "POST",
+//		        data: formData,
+//		        contentType:false,
+//		        processData:false,
+//		        success:function (returndata) {
+//		            console.log(returndata)
+//		    　　	}
+//		    　　})
+//		 };
+		 var btnupload2 = document.createElement('input'); //创建一个input控件
+		 btnupload2.setAttribute('type','button');
+		 btnupload2.setAttribute('value','上传');
+		 btnupload2.className ="upDate1";
+		 btnupload2.onclick=function(){
+		 	document.getElementById("btnupload1").click(); 
+		 };
+		 btnupload.insertBefore(btnupload1,null);
+		 btnupload.insertBefore(btnupload2,null);
+		 
+		 
+		 //下载文件
+		 var btndownload = document.createElement('input'); //创建一个input控件
+		 btndownload.setAttribute('type','button'); //type="button"
+		 btndownload.setAttribute('value','下载');
+		 btndownload.className='downl';
+		 btndownload.onclick=function(){
+			var $td=$(this).parent();
+		    var filename=$td.parent("tr").find("td").eq(1).text();
+		    console.log(filename);
+		 	$.ajax({
+		 		url:"http://10.0.106.3:8888/download", 
+		 		data:{"mydata": filename},
+		 		success:function(data){
+//       			window.open("http://10.0.106.3:8888/File0Save/"+data);
+//       			console.log(data);    			
+         			var $form = $('<form method="GET"></form>');
+				    $form.attr('action', "http://10.0.106.3:8888/File0Save/"+data);
+				    $form.appendTo($('body'));
+				    $form.submit();
+         		}
+      		});
+		 }
+		 
+		
+		//删除文件
+		btnDel.onclick=function(){
+			this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
+		}
+		delCell.appendChild(btnUpe1);
+//	    delCell.appendChild(btnok);
+	    delCell.appendChild(btnDel);  //把删除按钮加入td，别忘了
+	    delCell.appendChild(btnupload);
+	    delCell.appendChild(btndownload);  //把删除按钮加入td，别忘了
+	    return row;
+	}
+
+	//上传数据
+	$('table#tab').on("click",".upDate1",function(){
+		var $td=$(this).parent().parent();
+		var rowData=new Array();
+		var filename=$td.parent("tr").find("td").eq(1).text();
+	    console.log(filename);  //获取更新后的数据
+	    	var files = $("#btnupload1").get(0).files;
+			var formData = new FormData();
+			for(var i=0; i<files.length; i++){
+				formData.append("file2", files[i]);
+			}
+			formData.append("usr", filename);
+		    $.ajax({
+		        url:"http://127.0.0.1:8080/",   //接受文件地址
+		        type: "POST",
+		        data: formData,
+		        contentType:false,
+		        processData:false,
+		        success:function (returndata) {
+		            console.log(returndata)
+		    　　	}
+		    　　})
+	})
+
+
+	//更新数据
+	$('table#tab').on("click",".btnUpe1",function(){
+		var $td=$(this).parent();
+		var rowData=new Array();
+	    for(var i=0;i<4;i++){
+	    	rowData["td"+i.toString()]=$td.parent("tr").find("td").eq(i).text();
+	    }
+	    console.log(rowData);  //获取更新后的数据
+//	    console.log($td.parent("tr").find("td").eq(1).text());
+	})
+	
+	
+	
+	//双击修改单元格数据
+	$('table#tab').on("dblclick","td",function(){
+		var $td=$(this);
+	    var _t=$td.text();
+	    var _w=$td.width();
+		var _h=$td.height();
+		if($td.index()<4){
+			$td.html("").css({"padding":0});
+			var $input=$("<input type='text' style='width:100px'>");
+		    $input.appendTo($td).width(_w).height(_h).val(_t).focus().blur(function(){
+		    	$td.html($(this).val());
+		    });
+		}
+	});
+	
+	
+//	
+//	function aaa(){
+//		  	
+//		  var btn1 = document.getElementsByClassName("upDate1");
+//		
+//		  for(var i=0;i<btn1.length;i++){
+//		  
+//		  var a = btn1[i];
+//			 a.index = i;//给每个className为child的元素添加index属性;
+//			a.onclick = function(){
+//				var index11 = this.index;
+//				
+//				console.log(index11)
+//				
+//			}
+//		  }
+//		 } 
+//
+//aaa()
+//
+//	$('table#tab').on("dblclick","td",function(){
+//		var $td=$(this);
+//	    var _t=$td.text();
+//	    var _w=$td.width();
+//		var _h=$td.height();
+//	    $td.html("").css({"padding":0});
+//		var $input=$("<input type='text' style='width:100px'>");
+//	    $input.appendTo($td).width(_w).height(_h).val(_t).focus().blur(function(){
+//	    	$td.html($(this).val());
+//	    });
+//	});
+
+
+//	
+//	function  updt(){
+//		var upBtn = document.getElementsByClassName("btnUpe1");
+//		for(var i=0;i<upBtn.length;i++){
+//			var a = upBtn[i];
+// 			 a.index = i;//给每个className为child的元素添加index属性;
+//			a.onclick = function(){
+//				var s = this.parentElement.parentElement;
+//				var s1 = s.children[1];
+//				var s2 = s.children[2];
+//				var s3 = s.children[3];
+//				var input1 = document.createElement("input");
+//				input1.value = s1.innerText;
+//				input1.id='ipt1'
+//				input1.style.width ="100%";
+//				input1.style.height="100%";
+//				s1.innerText  ="";
+//				var input2 = document.createElement("input");
+//				input2.value = s2.innerText;
+//				input2.id='ipt2'
+//				input2.style.width ="100%";
+//				input2.style.height="100%";
+//				s2.innerText  ="";
+//				var input3 = document.createElement("input");
+//				input3.value = s3.innerText;
+//				input3.id='ipt3'
+//				input3.style.width ="100%";
+//				input3.style.height="100%";
+//				s3.innerText  ="";
+//				s1.appendChild(input1);
+//				s2.appendChild(input2);
+//				s3.appendChild(input3);
+//			}
+//		}
+//	}
+//	
+
+
+</script>
+
+</body>
+</html>
