@@ -128,7 +128,7 @@ def updateData():
     sel = 'update tab_myself_data_2019 set bh=%s,xm=%s,zw=%s,usrname=%s where bh=%s and usrname=%s;'
     cur.execute(sel,(bh,xm,zw,usrname,bh,usrname))
     conn.commit()
-    cur.close()
+    cur.close()oo
     conn.close()
     print(mydata)
     res=make_response(jsonify('插入成功'))
